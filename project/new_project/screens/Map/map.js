@@ -5,7 +5,23 @@ import { API_KEY, MAP_ID } from '../../secrets';
 import MapViewDirections from 'react-native-maps-directions';
 import SimpleButton from '../../components/SimpleButton'
 import { useRoute } from '@react-navigation/native';
+import List from '../../components/SimpleList'
 
+const getTimeOfTravel = async (origin, destination) => {
+  const modesOfTransport = ['driving', 'transit', 'bicycling', "walking"];
+  const transportModesWithTime = [];
+
+  for (let i = 0; i < modesOfTransport.length; i++) {
+    const mode = modesOfTransport[i];
+    const response = await fetch(`https://maps.googleapis.com/maps/api/directions/json?origin=${origin.latitude},${origin.longitude}&destination=${destination.latitude},${destination.longitude}&mode=${mode}&departure_time=now&traffic_model=pessimistic&key=${API_KEY}`);
+    const data = await response.json();
+    const time = data.routes[0].legs[0].duration.text;
+    const distance = data.routes[0].legs[0].distance.text;
+    transportModesWithTime.push({ mode, time, distance });
+  }
+  console.log(typeof(transportModesWithTime));
+  return transportModesWithTime;
+}
 
 const Map = (props) => {
     
@@ -15,7 +31,9 @@ const Map = (props) => {
     const [startLocation, setStartLocation] = useState(null);
     const [endLocation, setEndLocation] = useState(null);
     const [directions, setDirections] = useState(null);
-   
+   const [displayedInfos, setDisplayInfos] = useState(null);
+   let travelInfo = [];
+
     const handleMapPress = event => {
         const {latitude, longitude} = event.nativeEvent.coordinate;
         //setCoordinate({ latitude, longitude });
@@ -44,9 +62,15 @@ const Map = (props) => {
               }
           ])
             getDirections();
+
+            //verhicle + time
         }
         console.log(route.params);
     }, [route.params]);
+
+    useEffect(() => {
+        console.log(displayedInfos, "info from useEffect");
+    }, [displayedInfos])
 
     const getDirections = async () => {
 
@@ -59,6 +83,15 @@ const Map = (props) => {
             } catch (error) {
               console.error(error);
             }
+
+          try {
+            const travelInfo = await getTimeOfTravel(route.params["start"], route.params["end"]);
+            setDisplayInfos(travelInfo);
+          
+          }catch(error){
+            console.log(error);
+          }
+
   };
         
 
@@ -83,12 +116,12 @@ const Map = (props) => {
             strokeWidth={4}
             apikey={API_KEY}
             strokeColor="#111111"
-            mode="WALKING"
             
         />
-
+        {/*
+        {displayedInfos && <List style={stylesMap.list} items={displayedInfos} length={displayedInfos.length}/>}
+      * */}
         <SimpleButton title="Click" onPress={() => {props.navigation.navigate("DestinationSearch")}}/>
-      
     </MapView>
   );
 };
@@ -113,7 +146,10 @@ const stylesMap = StyleSheet.create({
   
         },
 
-        
+      list:{
+        padding: 50,
+        backgroundColor: "black",
+      }
 })
 
 export default Map;
