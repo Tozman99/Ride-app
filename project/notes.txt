@@ -1,0 +1,103 @@
+- customize the map
+- create a page where the user can select where he wants to go (maps places)
+- create geolocalisation
+- create navigation
+- implement times (matrix time google map library)
+- implement images + transports
+- take STIB api and implement the train
+- take Parkings, Trotinettes and bike location
+- create an "algorithm" that creates all the combinations and sort them by Time, Price & CO2 emission
+- create a view that summarize all the steps
+
+
+- create a new view (1st person)
+- display the vehicle used
+- 
+
+
+
+import { StatusBar } from 'expo-status-bar';
+import React, {useState, useEffect} from 'react'
+import { ScrollView, StyleSheet, Text, View, Button } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Map from './screens/map'
+import DestinationSearch from './screens/DestinationSearch';
+import * as Location from 'expo-location';
+import {NavigationContainer, StackActions} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
+
+
+const Stack = createNativeStackNavigator();
+
+const MapScreen = ({navigation}) => {
+
+  return (
+    <View>
+      <Map />
+      <Button title="Set Location" onPress={handleSetLocation} />
+    </View>
+  )
+}
+
+
+const App = () => {
+
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location);
+      console.log(location, "OK");
+    })();
+  }, []);
+
+  const handleSetLocation = async () => {
+    await Location.setIsEnabledAsync(true);
+    await Location.setAccuracyAsync(Location.Accuracy.High);
+    await Location.setCurrentPositionAsync({
+      coords: {
+        latitude: 50.439782,
+        longitude: 3.892838,
+      },
+    });
+  };
+
+  let text = 'Waiting..';
+  if (errorMsg) {
+    text = errorMsg;
+  } else if (location) {
+    text = JSON.stringify(location);
+  }
+
+  return (
+
+    <View>
+
+      <Map />
+    </View>
+    
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    ...StyleSheet.absoluteFillObject,
+    flex: 1, //the container will fill the whole screen.
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
+  },
+});
+
+
+export default App;

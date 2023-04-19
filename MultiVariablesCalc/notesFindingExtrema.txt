@@ -1,0 +1,28 @@
+
+
+x = 1 and  y = 4
+
+or
+
+x = 2  and y = 1
+
+C(x, y) = 4 x 1 + 16 x 1 x 4 = 68
+
+C(x, y) = 4 x 4 + 16 x 2 x 1 = 48
+
+
+ex boats: 
+
+f(x, 1) = 2xe exp(-x exp(2)), -2 <= x <= 2;
+
+x = 2;
+
+f(2, 1) = 4 e(exp(-4)), -2 <= x <= 2;
+
+f(2, 1)' = -16 e exp(-4) = 0;
+
+Concept learned very briefly : 
+
+- Partial derivative 
+
+
