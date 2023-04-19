@@ -31,8 +31,8 @@ const Map = (props) => {
     const [startLocation, setStartLocation] = useState(null);
     const [endLocation, setEndLocation] = useState(null);
     const [directions, setDirections] = useState(null);
-   const [displayedInfos, setDisplayInfos] = useState(null);
-   let travelInfo = [];
+    const [displayedInfos, setDisplayInfos] = useState(null);
+    let travelInfo = [];
 
     const handleMapPress = event => {
         const {latitude, longitude} = event.nativeEvent.coordinate;
@@ -65,13 +65,23 @@ const Map = (props) => {
 
             //verhicle + time
         }
+        //if (route.params?.mode == "driving"){
+          // take the length in meters and set a variable distance total
+
+          // find the closest parking by using getDirections and coordinate in json file
+
+          // render it
+
+          // recalculate the distance between the parking and the destination 
+
+          // assign the new transpport for the remaining distance
+        //}
         console.log(route.params);
-    }, [route.params]);
-
-    useEffect(() => {
         console.log(displayedInfos, "info from useEffect");
-    }, [displayedInfos])
 
+    }, [route.params, displayedInfos]);
+
+   
     const getDirections = async () => {
 
         try{

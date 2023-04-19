@@ -6,6 +6,7 @@ import styles from './styles.js';
 import PlaceRow from "./PlaceRow";
 import { TabRouter } from '@react-navigation/native';
 import { API_KEY } from '../../secrets.js';
+import OptionsComponent from '../../components/SimpleOptions.js';
 
 const homePlace = {
   description: 'Home',
@@ -26,7 +27,10 @@ const DestinationSearch = (props) => {
 
 
  
-
+  const options = [
+    "driving",
+    "bicycling"
+  ];
   const [coordinate, setCoordinate] = useState([
     {
       latitude: 48.8587741,
@@ -40,6 +44,8 @@ const DestinationSearch = (props) => {
 
   const [originPlace, setOriginPlace] = useState(null);
   const [destinationPlace, setDestinationPlace] = useState(null);
+  const [transport, setTransport] = useState("");
+
 
   // get latitude and longitude for origin and destination
 
@@ -51,18 +57,25 @@ const DestinationSearch = (props) => {
 
   useEffect(() => {
 
-    if (originPlace && destinationPlace){
+    if (originPlace && destinationPlace && transport){
 
       const coords = {originPlace, destinationPlace};
       setCoordinate(coords);
-      props.navigation.navigate("Map", {start: originPlace, end: destinationPlace, coordinate: coordinate});
+      props.navigation.navigate("Map", {start: originPlace, end: destinationPlace, coordinate: coordinate, mode: transport});
     }
     
   }, [originPlace, destinationPlace])
+
+  useEffect(() => {
+
+    console.log(transport);
+  }, [transport])
   
 
   return (
     <SafeAreaView>
+
+      
       <View style={styles.container}>
 
         <GooglePlacesAutocomplete
@@ -121,7 +134,8 @@ const DestinationSearch = (props) => {
           
         />
 
-        
+      <OptionsComponent options={options} setTransport={setTransport}/>
+
         {/* Circle near Origin input */}
         <View style={styles.circle} />
 
