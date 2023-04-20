@@ -15,10 +15,10 @@
             ]
             
          },
-         "coordinateMap": [
-            50.81613877976333, 
-            4.288525330585339
-         ],
+         "coordinateMap": {
+            "latitude": 50.81613877976333, 
+            "longitude": 4.288525330585339
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"CERIA",
@@ -55,10 +55,10 @@
             ]
          },
          "geometry_name":"geom",
-         "coordinateMap": [
-            50.81743427088669,
-            4.27735916869981
-         ],
+         "coordinateMap": {
+            "latitude": 50.81743427088669, 
+            "longitude": 4.27735916869981
+         },
          "properties":{
             "name_fr":"LENNIK-ERASME",
             "name_du":"LENNIK-ERASMUS",
@@ -93,10 +93,10 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.80082342948528, 
-            4.357174800759197
-         ],
+         "coordinateMap": {
+            "latitude": 50.80082342948528, 
+            "longitude":  4.357174800759197
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"STALLE",
@@ -132,10 +132,10 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.85642102982812, 
-            4.4231866262178805
-         ],
+         "coordinateMap": {
+            "latitude": 50.85642102982812, 
+            "longitude":  4.4231866262178805
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"ROODEBEEK",
@@ -171,10 +171,10 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.85083770562124, 
-            4.465971388362077
-         ],
+         "coordinateMap": {
+            "latitude": 50.85083770562124, 
+            "longitude":  4.465971388362077
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"CRAINHEM",
@@ -210,10 +210,10 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.81701823300581, 
-            4.405469128451348
-         ],
+         "coordinateMap": {
+            "latitude": 50.81701823300581, 
+            "longitude":  4.405469128451348
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"DELTA",
@@ -249,10 +249,10 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.8138378905847, 
-            4.42994393764204
-         ],
+         "coordinateMap": {
+            "latitude": 50.8138378905847, 
+            "longitude":  4.42994393764204
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"HERRMANN-DEBROUX",
@@ -288,10 +288,11 @@
                ]
             ]
          },
-         "coordinateMap": [
-            50.890385272565915, 
-            4.30866263539008
-         ],
+
+         "coordinateMap": {
+            "latitude": 50.890385272565915, 
+            "longitude":  4.30866263539008
+         },
          "geometry_name":"geom",
          "properties":{
             "name_fr":"UZ BRUSSEL",

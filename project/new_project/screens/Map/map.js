@@ -1,4 +1,4 @@
-import React, {Component, useState, useEffect, styles} from 'react';
+import React, {Component, useState, useEffect, styles, useMemo} from 'react';
 import { ScrollView, Text, View, StyleSheet, Dimensions} from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { API_KEY, MAP_ID } from '../../secrets';
@@ -6,6 +6,9 @@ import MapViewDirections from 'react-native-maps-directions';
 import SimpleButton from '../../components/SimpleButton'
 import { useRoute } from '@react-navigation/native';
 import List from '../../components/SimpleList'
+import { Asset } from 'expo-asset';
+import { getDistance } from 'geolib'; // import geolib library to calculate distance
+
 
 const getTimeOfTravel = async (origin, destination) => {
   const modesOfTransport = ['driving', 'transit', 'bicycling', "walking"];
@@ -19,9 +22,40 @@ const getTimeOfTravel = async (origin, destination) => {
     const distance = data.routes[0].legs[0].distance.text;
     transportModesWithTime.push({ mode, time, distance });
   }
-  console.log(typeof(transportModesWithTime));
   return transportModesWithTime;
 }
+
+const readJsonCoordinate = async (endLocation, setintermediateLocation) => {
+
+  try {
+
+          // Load JSON file
+    const jsonFile =  require('../../jsonFiles/parkRide.json');
+    console.log("endlocation", endLocation);
+    let minDistance = Number.MAX_VALUE;
+    // Parse JSON to array of coordinate objects
+    jsonFile.features.forEach((feature) => {
+
+      const { coordinateMap } = feature;
+      // calculate distance between coordinateMap and endLocation
+      const distance = getDistance(coordinateMap, endLocation);
+      // check if current distance is smaller than the current minimum distance
+      if (distance < minDistance) {
+        minDistance = distance;
+        nearestCoordinateMap = coordinateMap;
+        
+      }
+
+      
+    });
+    setintermediateLocation(nearestCoordinateMap);
+    console.log(nearestCoordinateMap);
+  } catch(error){
+    console.log(error);
+  }
+
+};
+
 
 const Map = (props) => {
     
@@ -32,7 +66,9 @@ const Map = (props) => {
     const [endLocation, setEndLocation] = useState(null);
     const [directions, setDirections] = useState(null);
     const [displayedInfos, setDisplayInfos] = useState(null);
+    const [intermediateLocation, setintermidiateLocation] = useState(null);
     let travelInfo = [];
+    let index = 0;
 
     const handleMapPress = event => {
         const {latitude, longitude} = event.nativeEvent.coordinate;
@@ -44,13 +80,24 @@ const Map = (props) => {
             setEndLocation({ latitude, longitude });
           }
     };
+
+    const setValues = async (setStartLocation, setEndLocation) => {
+      setStartLocation(route.params?.start);
+      setEndLocation(route.params?.end);
+      console.log(startLocation, endLocation, "VALUES");
+    };
     const { coords } = route.params || {};
-
+    
+    const memoizedParams = useMemo(() => route.params, [route.params]);
+    
     useEffect(() => {
+          console.log(memoizedParams, "OK xss \n");
+      if (route.params?.start && route.params?.end){
 
-      if (route.params != undefined && route.params?.start){
-            setStartLocation(route.params["start"]);
-            setEndLocation(route.params["end"]);
+            setStartLocation(memoizedParams.start);
+            setEndLocation(memoizedParams.end);
+            console.log(endLocation, startLocation, route.params, "OK", route.params.start, route.params.end);
+
             setCoordinate([
               {
               latitude: route.params["start"].latitude, 
@@ -60,10 +107,15 @@ const Map = (props) => {
                   latitude: route.params["end"].latitude,
                   longitude: route.params["end"].longitude
               }
-          ])
-            getDirections();
+          ]);
+
 
             //verhicle + time
+        }
+        if (startLocation != null && endLocation != null){
+
+              readJsonCoordinate(endLocation, setintermidiateLocation);
+              getDirections();
         }
         //if (route.params?.mode == "driving"){
           // take the length in meters and set a variable distance total
@@ -76,10 +128,8 @@ const Map = (props) => {
 
           // assign the new transpport for the remaining distance
         //}
-        console.log(route.params);
-        console.log(displayedInfos, "info from useEffect");
-
-    }, [route.params, displayedInfos]);
+        index += 1;
+    }, [startLocation, endLocation, route.params]);
 
    
     const getDirections = async () => {
@@ -122,10 +172,20 @@ const Map = (props) => {
     >
         <MapViewDirections
             origin={startLocation}
-            destination={endLocation}
+            destination={intermediateLocation}
             strokeWidth={4}
             apikey={API_KEY}
             strokeColor="#111111"
+            
+        />
+
+          <MapViewDirections
+            origin={intermediateLocation}
+            destination={endLocation}
+            strokeWidth={4}
+            apikey={API_KEY}
+            strokeColor="blue"
+            mode="WALKING"
             
         />
         {/*

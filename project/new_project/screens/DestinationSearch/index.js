@@ -63,14 +63,9 @@ const DestinationSearch = (props) => {
       setCoordinate(coords);
       props.navigation.navigate("Map", {start: originPlace, end: destinationPlace, coordinate: coordinate, mode: transport});
     }
-    
-  }, [originPlace, destinationPlace])
-
-  useEffect(() => {
-
     console.log(transport);
-  }, [transport])
-  
+  }, [originPlace, destinationPlace, transport])
+
 
   return (
     <SafeAreaView>
