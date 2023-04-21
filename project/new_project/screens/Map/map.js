@@ -1,5 +1,5 @@
-import React, {Component, useState, useEffect, styles, useMemo} from 'react';
-import { ScrollView, Text, View, StyleSheet, Dimensions} from 'react-native';
+import React, {Component, useState, useEffect, styles, useMemo, useRef, useCallback} from 'react';
+import { ScrollView, Text, View, StyleSheet, Dimensions, TouchableOpacity, SafeAreaView, Geolocation} from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { API_KEY, MAP_ID } from '../../secrets';
 import MapViewDirections from 'react-native-maps-directions';
@@ -8,7 +8,27 @@ import { useRoute } from '@react-navigation/native';
 import List from '../../components/SimpleList'
 import { Asset } from 'expo-asset';
 import { getDistance } from 'geolib'; // import geolib library to calculate distance
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  runOnUI,
+} from 'react-native-reanimated';
+import { Location } from 'expo-location';
 
+
+const getLocation = async () => {
+  const { status } = await Location.requestForegroundPermissionsAsync();
+  if (status !== 'granted') {
+    console.log('Permission to access location was denied');
+    return;
+  }
+
+  const { coords } = await Location.getCurrentPositionAsync({});
+  const { latitude, longitude } = coords;
+
+  console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+};
 
 const getTimeOfTravel = async (origin, destination) => {
   const modesOfTransport = ['driving', 'transit', 'bicycling', "walking"];
@@ -58,6 +78,8 @@ const readJsonCoordinate = async (endLocation, setintermediateLocation) => {
 
 
 const Map = (props) => {
+
+
     
     const route = useRoute();
     const [coordinate, setCoordinate] = useState([]);
@@ -67,8 +89,19 @@ const Map = (props) => {
     const [directions, setDirections] = useState(null);
     const [displayedInfos, setDisplayInfos] = useState(null);
     const [intermediateLocation, setintermidiateLocation] = useState(null);
+    const [currentPosition, setCurrentPosition] = useState(null);
+
     let travelInfo = [];
     let index = 0;
+    const mapRef = useRef(null);
+    let region = {
+      latitude: 50.453330,
+      longitude: 3.948740,
+      latitudeDelta: 0.1988,
+      longitudeDelta: 0.1432,
+    };
+
+    const image = require("../../assets/parkingMarker.png");
 
     const handleMapPress = event => {
         const {latitude, longitude} = event.nativeEvent.coordinate;
@@ -112,26 +145,25 @@ const Map = (props) => {
 
             //verhicle + time
         }
-        if (startLocation != null && endLocation != null){
+        getLocation();
 
+
+        if (startLocation != null && endLocation != null){
+               region = {
+                latitude: (startLocation.latitude + endLocation.latitude)/ 2,
+                longitude: (startLocation.longitude + endLocation.longitude)/ 2,
+                longitudeDelta: 1.2,
+                latitudeDelta: 1.2,
+                
+              };
+              mapRef.current.animateToRegion(region, 1000);
               readJsonCoordinate(endLocation, setintermidiateLocation);
               getDirections();
         }
-        //if (route.params?.mode == "driving"){
-          // take the length in meters and set a variable distance total
-
-          // find the closest parking by using getDirections and coordinate in json file
-
-          // render it
-
-          // recalculate the distance between the parking and the destination 
-
-          // assign the new transpport for the remaining distance
-        //}
+        
         index += 1;
     }, [startLocation, endLocation, route.params]);
 
-   
     const getDirections = async () => {
 
         try{
@@ -157,15 +189,11 @@ const Map = (props) => {
 
   return (
     <MapView style={stylesMap.container}
-      region={{
-        latitude: 50.454819,
-        longitude: 3.958288,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      }}
+      region={region}
+      ref={mapRef}
       //customMapStyle={/* your custom map style */}
       showsUserLocation
-
+      customMapStyle={stylesMap.MapStyle}
       provider={PROVIDER_GOOGLE}
       //onPress={handleMapPress}
 
@@ -173,28 +201,45 @@ const Map = (props) => {
         <MapViewDirections
             origin={startLocation}
             destination={intermediateLocation}
-            strokeWidth={4}
+            strokeWidth={5}
             apikey={API_KEY}
-            strokeColor="#111111"
+            strokeColor="#800080"
             
         />
 
           <MapViewDirections
             origin={intermediateLocation}
             destination={endLocation}
-            strokeWidth={4}
+            strokeWidth={5}
             apikey={API_KEY}
             strokeColor="blue"
             mode="WALKING"
             
         />
+        {startLocation && <Marker pinColor='green' coordinate={{latitude: startLocation.latitude, longitude: startLocation.longitude}}/>}
+        {endLocation && <Marker pinColor='red' coordinate={{latitude: endLocation.latitude, longitude: endLocation.longitude}}/>}
+        {intermediateLocation && <Marker image={image} coordinate={{latitude: intermediateLocation.latitude, longitude: intermediateLocation.longitude}}/>}
+
         {/*
         {displayedInfos && <List style={stylesMap.list} items={displayedInfos} length={displayedInfos.length}/>}
       * */}
-        <SimpleButton title="Click" onPress={() => {props.navigation.navigate("DestinationSearch")}}/>
+    
     </MapView>
   );
 };
+
+
+const stylessheet = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: 'grey',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
+});
 
 const stylesMap = StyleSheet.create({
 
@@ -219,7 +264,21 @@ const stylesMap = StyleSheet.create({
       list:{
         padding: 50,
         backgroundColor: "black",
-      }
+      },
+      button: {
+        backgroundColor: '#4CAF50',
+        borderRadius: 10,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        
+        
+      },
+      image:{
+        width: 50,
+        heihgt:50
+      },
+      
+
 })
 
 export default Map;

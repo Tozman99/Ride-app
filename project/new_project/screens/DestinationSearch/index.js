@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {View, TextInput, SafeAreaView} from 'react-native';
+import {View, TextInput, SafeAreaView, StyleSheet} from 'react-native';
 import { GooglePlacesAutocomplete } from 'react-native-google-places-autocomplete';
 import * as Location from 'expo-location';
 import styles from './styles.js';
@@ -19,6 +19,7 @@ const getPlaceDetails = async (placeId) => {
   const response = await fetch(apiUrl);
   const data = await response.json();
   const { lat, lng } = data.result.geometry.location;
+
 
  return {latitude: lat, longitude: lng};
 };
@@ -54,8 +55,8 @@ const DestinationSearch = (props) => {
     const coords = await getPlaceDetails(placeId);
     setLocation(coords);
   };
-
   useEffect(() => {
+    setTransport("driving");
 
     if (originPlace && destinationPlace && transport){
 
@@ -94,7 +95,7 @@ const DestinationSearch = (props) => {
             key: 'AIzaSyCSNIOELEFXqYqOfI0cz83ixqpMBtuFtOQ',
             language: 'en',
           }}
-          renderRow={(data) => <PlaceRow data={data} />}
+          renderRow={(data) => <PlaceRow   data={data} />}
           renderDescription={(data) => data.description || data.vicinity}
           predefinedPlaces={[homePlace]}
           
@@ -128,9 +129,9 @@ const DestinationSearch = (props) => {
           
           
         />
+      {/*{<OptionsComponent options={options} style={optionStyles.options} setTransport={setTransport}/>}
 
-      <OptionsComponent options={options} setTransport={setTransport}/>
-
+*/}
         {/* Circle near Origin input */}
         <View style={styles.circle} />
 
@@ -144,5 +145,13 @@ const DestinationSearch = (props) => {
     </SafeAreaView>
   );
 };
+
+const optionStyles = StyleSheet.create({
+
+  options: {
+    margin: 100,
+    position: "relative"
+  }
+})
 
 export default DestinationSearch;

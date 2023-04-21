@@ -1,13 +1,19 @@
 import React from 'react';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, Text, StyleSheet, Image } from 'react-native';
 
 const OptionsComponent = ({ options, setTransport }) => {
 
+  const Image_1 = require("../assets/car.jpeg");
+  const bicycleImage_2 = require("../assets/bicycle.jpg");
+  const trotImage_3 = require("../assets/trotinette.jpg");
+  setTransport("driving");
+
   return (
+
+    {/*
     <View style={styles.container}>
       {options.map((option) => (
         <TouchableOpacity
-          key={option}
           style={styles.button}
           onPress={() => setTransport(option)}
         >
@@ -15,6 +21,7 @@ const OptionsComponent = ({ options, setTransport }) => {
         </TouchableOpacity>
       ))}
     </View>
+      */}
   );
 };
 
@@ -23,7 +30,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 10,
+    marginVertical: 200,
+    position: "relative"
   },
   button: {
     backgroundColor: '#4CAF50',
